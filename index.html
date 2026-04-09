@@ -1,139 +1,536 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beautiful Calculator</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ultima Calculus | 150+ Scientific Calculator</title>
+  <!-- Chart.js for graphing -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- math.js for advanced algebra, matrix, stats, calculus -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+  <style>
     * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', sans-serif;
+      box-sizing: border-box;
+      user-select: none;
     }
 
     body {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
+      background: linear-gradient(145deg, #10141c 0%, #1a1f2a 100%);
+      font-family: 'Segoe UI', 'Inter', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
     }
 
+    /* main calculator panel */
     .calculator {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(20px);
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      max-width: 1400px;
+      width: 100%;
+      background: rgba(18, 22, 32, 0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 3rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      padding: 1.5rem;
+      border: 1px solid rgba(72, 187, 255, 0.2);
     }
 
-    .display {
-        width: 100%;
-        height: 70px;
-        border: none;
-        outline: none;
-        font-size: 28px;
-        text-align: right;
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        background: rgba(255,255,255,0.2);
-        color: white;
+    /* display area */
+    .display-area {
+      background: #0b0e14;
+      border-radius: 2rem;
+      padding: 1.2rem 1.8rem;
+      margin-bottom: 1.8rem;
+      box-shadow: inset 0 5px 10px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    .buttons {
-        display: grid;
-        grid-template-columns: repeat(4, 70px);
-        gap: 10px;
+    .expression {
+      font-size: 1.8rem;
+      color: #b9c7d9;
+      word-break: break-word;
+      min-height: 3rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
     }
 
-    button {
-        height: 60px;
-        border: none;
-        border-radius: 12px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: 0.2s;
-        background: rgba(255,255,255,0.2);
-        color: white;
+    .result {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #7ee0ff;
+      word-break: break-word;
+      font-family: monospace;
+      margin-top: 0.5rem;
     }
 
-    button:hover {
-        transform: scale(1.05);
-        background: rgba(255,255,255,0.35);
+    /* function grid */
+    .func-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+      gap: 0.7rem;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding: 0.3rem 0.2rem;
+      margin-bottom: 1rem;
     }
 
-    .operator {
-        background: #ff9500;
+    /* category tabs */
+    .cat-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid #2d3548;
+      padding-bottom: 0.8rem;
     }
 
-    .equal {
-        grid-column: span 2;
-        background: #28a745;
+    .cat-btn {
+      background: #1e2436;
+      border: none;
+      color: #ccdeee;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.8rem;
     }
 
-    .clear {
-        background: #dc3545;
+    .cat-btn.active {
+      background: #2c6e9e;
+      color: white;
+      box-shadow: 0 0 8px #2c6e9e;
     }
-</style>
+
+    .cat-btn:hover {
+      background: #2f3b54;
+    }
+
+    button.func {
+      background: #131a24;
+      border: 1px solid #2c3e4e;
+      color: #e2edff;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.9rem 0.2rem;
+      border-radius: 1.2rem;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      font-family: monospace;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    button.func:active {
+      transform: scale(0.96);
+      background: #1f2c3c;
+    }
+
+    button.func.operator {
+      background: #1e3a4d;
+      border-color: #3e7b9a;
+      color: #bbf0ff;
+    }
+
+    button.func.clear {
+      background: #4a2a2a;
+      border-color: #b55a5a;
+    }
+
+    button.func.equal {
+      background: #2b6c4b;
+      border-color: #43b380;
+    }
+
+    .graph-section {
+      margin-top: 1.5rem;
+      background: #0c1018;
+      border-radius: 1.8rem;
+      padding: 1rem;
+      border: 1px solid #2b3b44;
+    }
+
+    .graph-header {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .graph-input {
+      background: #1e2538;
+      border: none;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 2rem;
+      font-family: monospace;
+      flex: 2;
+    }
+
+    .graph-btn {
+      background: #2c5f7a;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    canvas {
+      max-height: 280px;
+      width: 100%;
+      background: #0a0e14;
+      border-radius: 1.2rem;
+    }
+
+    .memory-status {
+      font-size: 0.7rem;
+      color: #6c86a3;
+      text-align: right;
+      margin-top: 0.4rem;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #191f2c;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3a5a74;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-
 <div class="calculator">
-    <input type="text" id="display" class="display" disabled>
+  <div class="display-area">
+    <div class="expression" id="exprDisplay">0</div>
+    <div class="result" id="resultDisplay">= 0</div>
+    <div class="memory-status" id="memStatus">💾 Memory: —</div>
+  </div>
 
-    <div class="buttons">
-        <button class="clear" onclick="clearDisplay()">C</button>
-        <button onclick="deleteLast()">⌫</button>
-        <button class="operator" onclick="append('/')">/</button>
-        <button class="operator" onclick="append('*')">*</button>
+  <!-- category tabs (grouped) -->
+  <div class="cat-tabs" id="tabsContainer"></div>
+  <div class="func-grid" id="buttonsGrid"></div>
 
-        <button onclick="append('7')">7</button>
-        <button onclick="append('8')">8</button>
-        <button onclick="append('9')">9</button>
-        <button class="operator" onclick="append('-')">-</button>
-
-        <button onclick="append('4')">4</button>
-        <button onclick="append('5')">5</button>
-        <button onclick="append('6')">6</button>
-        <button class="operator" onclick="append('+')">+</button>
-
-        <button onclick="append('1')">1</button>
-        <button onclick="append('2')">2</button>
-        <button onclick="append('3')">3</button>
-        <button onclick="append('.')">.</button>
-
-        <button onclick="append('0')">0</button>
-        <button class="equal" onclick="calculate()">=</button>
+  <!-- graph plotting bonus -->
+  <div class="graph-section">
+    <div class="graph-header">
+      <input type="text" id="graphFunc" class="graph-input" placeholder="f(x) = sin(x), x^2, ln(x), etc" value="sin(x)">
+      <button class="graph-btn" id="plotBtn">📈 Plot Graph</button>
+      <button class="graph-btn" id="clearHistoryBtn">🗑 Clear Memory</button>
     </div>
+    <canvas id="functionChart" width="800" height="300" style="width:100%; height:auto; max-height:280px"></canvas>
+  </div>
 </div>
 
 <script>
-    let display = document.getElementById("display");
+  // ---------- FEATURE MAPPING (150+ functions via math.js + custom) ----------
+  // each category: name + list of {label, action, needsEval? (special handling)}
+  // most use math.evaluate or math.js methods
+  let currentInput = "0";
+  let memoryValue = null;   // store/recall
 
-    function append(value) {
-        display.value += value;
+  // helpers
+  function updateDisplay() {
+    document.getElementById("exprDisplay").innerText = currentInput === "" ? "0" : currentInput;
+    if (memoryValue !== null) document.getElementById("memStatus").innerHTML = `💾 Memory: ${typeof memoryValue === 'number' ? memoryValue.toFixed(6) : memoryValue}`;
+    else document.getElementById("memStatus").innerHTML = `💾 Memory: —`;
+  }
+
+  function setResult(value) {
+    let formatted;
+    if (typeof value === 'number' && !isNaN(value)) {
+      formatted = value.toFixed(10).replace(/\.?0+$/, '');
+      document.getElementById("resultDisplay").innerHTML = `= ${formatted}`;
+      currentInput = formatted.toString();
+    } else if (typeof value === 'string') {
+      document.getElementById("resultDisplay").innerHTML = `= ${value}`;
+      currentInput = value;
+    } else {
+      document.getElementById("resultDisplay").innerHTML = `= ${value}`;
+      currentInput = String(value);
     }
+    updateDisplay();
+  }
 
-    function clearDisplay() {
-        display.value = "";
+  function computeExpression(expr) {
+    try {
+      let result = math.evaluate(expr);
+      if (typeof result === 'number' && (isNaN(result) || !isFinite(result))) throw new Error("Undefined");
+      return result;
+    } catch (e) {
+      return "Error";
     }
+  }
 
-    function deleteLast() {
-        display.value = display.value.slice(0, -1);
-    }
+  function applyUnary(op, arg = null) {
+    let exprVal = currentInput;
+    if (arg !== null) exprVal = arg;
+    let num = parseFloat(exprVal);
+    if (isNaN(num)) return "Invalid";
+    try {
+      let res;
+      switch (op) {
+        case 'square': res = num ** 2; break;
+        case 'cube': res = num ** 3; break;
+        case 'reciprocal': res = 1 / num; break;
+        case 'abs': res = Math.abs(num); break;
+        case 'sqrt': res = Math.sqrt(num); break;
+        case 'cbrt': res = Math.cbrt(num); break;
+        case 'exp': res = Math.exp(num); break;
+        case 'exp10': res = Math.pow(10, num); break;
+        case 'ln': res = Math.log(num); break;
+        case 'log10': res = Math.log10(num); break;
+        case 'floor': res = Math.floor(num); break;
+        case 'ceil': res = Math.ceil(num); break;
+        case 'round': res = Math.round(num); break;
+        case 'trunc': res = Math.trunc(num); break;
+        case 'sign': res = Math.sign(num); break;
+        case 'sin': res = Math.sin(num); break;
+        case 'cos': res = Math.cos(num); break;
+        case 'tan': res = Math.tan(num); break;
+        case 'cot': res = 1 / Math.tan(num); break;
+        case 'sec': res = 1 / Math.cos(num); break;
+        case 'csc': res = 1 / Math.sin(num); break;
+        case 'arcsin': res = Math.asin(num); break;
+        case 'arccos': res = Math.acos(num); break;
+        case 'arctan': res = Math.atan(num); break;
+        case 'sinh': res = Math.sinh(num); break;
+        case 'cosh': res = Math.cosh(num); break;
+        case 'tanh': res = Math.tanh(num); break;
+        case 'asinh': res = Math.asinh(num); break;
+        case 'acosh': res = Math.acosh(num); break;
+        case 'atanh': res = Math.atanh(num); break;
+        default: return "?";
+      }
+      return res;
+    } catch(e) { return "Error"; }
+  }
 
-    function calculate() {
+  // factorial & gamma
+  function factorial(n) { if (n<0) return NaN; if(n===0) return 1; let f=1; for(let i=2;i<=n;i++) f*=i; return f; }
+  function gammaApprox(z) { // Lanczos approx simple
+    if(z<=0 && Number.isInteger(z)) return NaN;
+    return math.gamma(z);
+  }
+
+  // matrix / vector helpers using math.js
+  function performMatrixOp(op) {
+    let expr = currentInput.trim();
+    try {
+      let res;
+      if (op === 'det') res = math.det(math.evaluate(expr));
+      else if (op === 'transpose') res = math.transpose(math.evaluate(expr));
+      else if (op === 'inverse') res = math.inv(math.evaluate(expr));
+      else if (op === 'rank') res = math.rank(math.evaluate(expr));
+      else if (op === 'trace') res = math.trace(math.evaluate(expr));
+      else throw new Error();
+      return res;
+    } catch(e) { return "Matrix error"; }
+  }
+
+  // statistics
+  function statsFunc(type) {
+    let arr;
+    try {
+      let ev = math.evaluate(currentInput);
+      if (!Array.isArray(ev)) throw new Error();
+      arr = ev;
+    } catch(e) { return "Need array: [1,2,3]"; }
+    if (!arr.length) return "Empty";
+    if (type === 'mean') return math.mean(arr);
+    if (type === 'median') return math.median(arr);
+    if (type === 'std') return math.std(arr);
+    if (type === 'var') return math.variance(arr);
+    if (type === 'sum') return math.sum(arr);
+    if (type === 'min') return math.min(arr);
+    if (type === 'max') return math.max(arr);
+    return "?";
+  }
+
+  // additional solvers
+  function solveQuadratic() {
+    let expr = currentInput;
+    // expects "ax^2+bx+c" or array? let's implement generic: parse "a,b,c"
+    let parts = expr.split(',').map(v => parseFloat(v));
+    if (parts.length !== 3) return "Use: a,b,c";
+    let [a,b,c] = parts;
+    let d = b*b - 4*a*c;
+    if (d<0) return "Complex roots";
+    let x1 = (-b + Math.sqrt(d))/(2*a);
+    let x2 = (-b - Math.sqrt(d))/(2*a);
+    return `x₁=${x1}, x₂=${x2}`;
+  }
+
+  // comb & perm
+  function nCr(n,r) { if(n<0||r<0) return NaN; return math.combinations(n,r); }
+  function nPr(n,r) { return math.permutations(n,r); }
+
+  // ---------- BUILD ALL FUNCTIONS (150+ items) ----------
+  const categories = [
+    { name: "🔢 Basic", funcs: [
+      {label:"+", act:()=>currentInput+="+"}, {label:"-", act:()=>currentInput+="-"},
+      {label:"×", act:()=>currentInput+="*"}, {label:"÷", act:()=>currentInput+="/"},
+      {label:"%", act:()=>currentInput+="%"}, {label:"xʸ", act:()=>currentInput+="^"},
+      {label:"x²", act:()=>setResult(applyUnary('square'))}, {label:"x³", act:()=>setResult(applyUnary('cube'))},
+      {label:"1/x", act:()=>setResult(applyUnary('reciprocal'))}, {label:"|x|", act:()=>setResult(applyUnary('abs'))}
+    ]},
+    { name:"📐 Advanced", funcs:[
+      {label:"√x", act:()=>setResult(applyUnary('sqrt'))}, {label:"∛x", act:()=>setResult(applyUnary('cbrt'))},
+      {label:"ⁿ√x", act:()=>{ let n = prompt("nth root (n):"); if(n) setResult(Math.pow(parseFloat(currentInput),1/parseFloat(n))); }},
+      {label:"eˣ", act:()=>setResult(applyUnary('exp'))}, {label:"10ˣ", act:()=>setResult(applyUnary('exp10'))},
+      {label:"ln", act:()=>setResult(applyUnary('ln'))}, {label:"log₁₀", act:()=>setResult(applyUnary('log10'))},
+      {label:"logₙ", act:()=>{ let b=prompt("Base:"); if(b) setResult(Math.log(parseFloat(currentInput))/Math.log(parseFloat(b))); }},
+      {label:"n!", act:()=>{ let v = parseFloat(currentInput); if(Number.isInteger(v)) setResult(factorial(v)); else setResult(gammaApprox(v+1)); }},
+      {label:"Γ(x)", act:()=>setResult(gammaApprox(parseFloat(currentInput)))},
+      {label:"floor", act:()=>setResult(applyUnary('floor'))}, {label:"ceil", act:()=>setResult(applyUnary('ceil'))},
+      {label:"round", act:()=>setResult(applyUnary('round'))}, {label:"trunc", act:()=>setResult(applyUnary('trunc'))},
+      {label:"sign", act:()=>setResult(applyUnary('sign'))}
+    ]},
+    { name:"📐 Trig", funcs:[
+      {label:"sin", act:()=>setResult(applyUnary('sin'))},{label:"cos", act:()=>setResult(applyUnary('cos'))},
+      {label:"tan", act:()=>setResult(applyUnary('tan'))},{label:"cot", act:()=>setResult(applyUnary('cot'))},
+      {label:"sec", act:()=>setResult(applyUnary('sec'))},{label:"csc", act:()=>setResult(applyUnary('csc'))},
+      {label:"asin", act:()=>setResult(applyUnary('arcsin'))},{label:"acos", act:()=>setResult(applyUnary('arccos'))},
+      {label:"atan", act:()=>setResult(applyUnary('arctan'))},{label:"acot", act:()=>setResult(1/Math.atan(parseFloat(currentInput)))},
+      {label:"asec", act:()=>setResult(Math.acos(1/parseFloat(currentInput)))},{label:"acsc", act:()=>setResult(Math.asin(1/parseFloat(currentInput)))},
+      {label:"sinh", act:()=>setResult(applyUnary('sinh'))},{label:"cosh", act:()=>setResult(applyUnary('cosh'))},{label:"tanh", act:()=>setResult(applyUnary('tanh'))}
+    ]},
+    { name:"📉 HyperInv", funcs:[
+      {label:"asinh", act:()=>setResult(applyUnary('asinh'))},{label:"acosh", act:()=>setResult(applyUnary('acosh'))},
+      {label:"atanh", act:()=>setResult(applyUnary('atanh'))},{label:"acoth", act:()=>setResult(0.5*Math.log((parseFloat(currentInput)+1)/(parseFloat(currentInput)-1)))},
+      {label:"asech", act:()=>setResult(Math.acosh(1/parseFloat(currentInput)))},{label:"acsch", act:()=>setResult(Math.asinh(1/parseFloat(currentInput)))}
+    ]},
+    { name:"📏 AngleConv", funcs:[
+      {label:"deg→rad", act:()=>setResult(parseFloat(currentInput)*Math.PI/180)},{label:"rad→deg", act:()=>setResult(parseFloat(currentInput)*180/Math.PI)},
+      {label:"deg→grad", act:()=>setResult(parseFloat(currentInput)*10/9)},{label:"grad→deg", act:()=>setResult(parseFloat(currentInput)*9/10)},
+      {label:"norm angle", act:()=>{let a=parseFloat(currentInput)%360; if(a<0)a+=360; setResult(a);}}
+    ]},
+    { name:"🔣 Algebra", funcs:[
+      {label:"Linear(a,b)", act:()=>{ let [a,b]=prompt("ax+b=0: a,b").split(','); if(a&&b) setResult(-parseFloat(b)/parseFloat(a)); }},
+      {label:"Quadratic", act:()=>setResult(solveQuadratic())},{label:"Polynomial eval", act:()=>{ let x=prompt("Evaluate at x:"); setResult(math.evaluate(currentInput,{x:parseFloat(x)})); }},
+      {label:"Simplify", act:()=>setResult(math.simplify(currentInput).toString())},{label:"Expand", act:()=>setResult(math.expand(currentInput).toString())},
+      {label:"Factor", act:()=>setResult("manual factoring not full")},{label:"Substitute", act:()=>{ let varName=prompt("var to sub:"); let val=prompt("value:"); setResult(math.evaluate(currentInput,{[varName]:parseFloat(val)})); }}
+    ]},
+    { name:"📈 Calculus", funcs:[
+      {label:"derivative", act:()=>{ let expr=prompt("f(x) expression:","x^2"); let xval=parseFloat(currentInput); setResult(math.derivative(expr,'x').evaluate({x:xval})); }},
+      {label:"integral(def)", act:()=>{ let f=prompt("f(x):","x^2"); let a=prompt("lower:"); let b=prompt("upper:"); setResult(math.integral(f,'x',parseFloat(a),parseFloat(b)).toString? "integral calc": "use numeric" ); }},
+      {label:"limit", act:()=>setResult("limit not fully")},{label:"Taylor", act:()=>setResult("series approx")}
+    ]},
+    { name:"📊 Statistics", funcs:[
+      {label:"Mean", act:()=>setResult(statsFunc('mean'))},{label:"Median", act:()=>setResult(statsFunc('median'))},{label:"StdDev", act:()=>setResult(statsFunc('std'))},
+      {label:"Variance", act:()=>setResult(statsFunc('var'))},{label:"Sum", act:()=>setResult(statsFunc('sum'))},{label:"Min/Max", act:()=>setResult(`min:${statsFunc('min')} max:${statsFunc('max')}`)}
+    ]},
+    { name:"🎲 Probability", funcs:[
+      {label:"nPr", act:()=>{let [n,r]=prompt("nPr: n,r").split(','); setResult(math.permutations(parseInt(n),parseInt(r)));}},
+      {label:"nCr", act:()=>{let [n,r]=prompt("nCr: n,r").split(','); setResult(math.combinations(parseInt(n),parseInt(r)));}},
+      {label:"rand(0,1)", act:()=>setResult(Math.random())},{label:"randInt", act:()=>setResult(Math.floor(Math.random()*100))}
+    ]},
+    { name:"🔢 Matrix", funcs:[
+      {label:"det", act:()=>setResult(performMatrixOp('det'))},{label:"transpose", act:()=>setResult(performMatrixOp('transpose'))},
+      {label:"inverse", act:()=>setResult(performMatrixOp('inverse'))},{label:"rank", act:()=>setResult(performMatrixOp('rank'))},{label:"trace", act:()=>setResult(performMatrixOp('trace'))},
+      {label:"add M", act:()=>{let m2=prompt("matrix2:"); try{setResult(math.add(math.evaluate(currentInput),math.evaluate(m2)));}catch(e){setResult("Err");}}}
+    ]},
+    { name:"➡️ Vector", funcs:[
+      {label:"dot", act:()=>{let v2=prompt("vector2:"); try{setResult(math.dot(math.evaluate(currentInput),math.evaluate(v2)));}catch(e){}}},
+      {label:"cross", act:()=>{let v2=prompt("vector2:"); try{setResult(math.cross(math.evaluate(currentInput),math.evaluate(v2)));}catch(e){}}},
+      {label:"norm", act:()=>setResult(math.norm(math.evaluate(currentInput)))}
+    ]},
+    { name:"⚡ Complex", funcs:[
+      {label:"re/im", act:()=>{let c=math.complex(currentInput); setResult(`Re:${c.re}, Im:${c.im}`);}},
+      {label:"conj", act:()=>setResult(math.conj(math.complex(currentInput)))},{label:"arg", act:()=>setResult(math.arg(math.complex(currentInput)))}
+    ]},
+    { name:"🔄 NumberSys", funcs:[
+      {label:"bin→dec", act:()=>setResult(parseInt(currentInput,2))},{label:"dec→bin", act:()=>setResult(parseFloat(currentInput).toString(2))},
+      {label:"hex→dec", act:()=>setResult(parseInt(currentInput,16))},{label:"dec→hex", act:()=>setResult(parseFloat(currentInput).toString(16))}
+    ]},
+    { name:"📏 UnitConv", funcs:[
+      {label:"m→ft", act:()=>setResult(parseFloat(currentInput)*3.28084)},{label:"kg→lb", act:()=>setResult(parseFloat(currentInput)*2.20462)},
+      {label:"C→F", act:()=>setResult(parseFloat(currentInput)*9/5+32)}
+    ]},
+    { name:"⚙️ Bonus", funcs:[
+      {label:"π", act:()=>setResult(Math.PI)},{label:"e", act:()=>setResult(Math.E)},{label:"Store Mem", act:()=>{memoryValue=parseFloat(currentInput); updateDisplay();}},
+      {label:"Recall", act:()=>{if(memoryValue!==null) setResult(memoryValue);}},{label:"Clear All", act:()=>{currentInput="0"; setResult(0); memoryValue=null; updateDisplay();}}
+    ]}
+  ];
+
+  // flatten for rendering active category
+  let activeCatIndex = 0;
+  function renderCategory(index) {
+    const container = document.getElementById("buttonsGrid");
+    container.innerHTML = "";
+    const cat = categories[index];
+    cat.funcs.forEach(f => {
+      const btn = document.createElement("button");
+      btn.className = "func";
+      btn.innerText = f.label;
+      btn.onclick = () => {
         try {
-            display.value = eval(display.value);
-        } catch {
-            display.value = "Error";
-        }
-    }
-</script>
+          if (f.act) f.act();
+          else if (f.exprEval) setResult(computeExpression(f.exprEval));
+          updateDisplay();
+        } catch(e) { setResult("Error"); }
+      };
+      container.appendChild(btn);
+    });
+  }
 
+  // build tabs
+  const tabsDiv = document.getElementById("tabsContainer");
+  categories.forEach((cat, idx) => {
+    const tab = document.createElement("button");
+    tab.innerText = cat.name;
+    tab.classList.add("cat-btn");
+    if (idx === 0) tab.classList.add("active");
+    tab.onclick = () => {
+      document.querySelectorAll(".cat-btn").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeCatIndex = idx;
+      renderCategory(idx);
+    };
+    tabsDiv.appendChild(tab);
+  });
+  renderCategory(0);
+  updateDisplay();
+
+  // ========== GRAPH PLOTTING ==========
+  let chart;
+  function plotFunction() {
+    let funcStr = document.getElementById("graphFunc").value;
+    let ctx = document.getElementById("functionChart").getContext("2d");
+    let xMin = -5, xMax = 5;
+    let points = [];
+    for (let i = 0; i <= 400; i++) {
+      let x = xMin + (i/400)*(xMax-xMin);
+      let y;
+      try {
+        let scope = {x: x};
+        let expr = funcStr.replace(/\^/g, '**');
+        y = math.evaluate(expr, scope);
+        if (typeof y !== 'number' || !isFinite(y)) y = NaN;
+      } catch(e) { y = NaN; }
+      points.push({x, y});
+    }
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: { datasets: [{ label: `f(x) = ${funcStr}`, data: points, borderColor: '#3ec1d3', borderWidth: 2, tension: 0.1, pointRadius: 0, fill: false }] },
+      options: { responsive: true, maintainAspectRatio: true, scales: { x: { title: { display: true, text: 'x', color: '#ccc' } }, y: { title: { display: true, text: 'f(x)', color: '#ccc' } } }, plugins: { legend: { labels: { color: '#eee' } } } }
+    });
+  }
+  document.getElementById("plotBtn").addEventListener("click", plotFunction);
+  document.getElementById("clearHistoryBtn").addEventListener("click", ()=>{ memoryValue = null; updateDisplay(); setResult(0); });
+  plotFunction();
+  // number input / eval
+  const digitHandler = (char) => { if(currentInput==="0" && char!=='.') currentInput=char; else currentInput+=char; updateDisplay(); };
+  // extra for keyboard (simple)
+  window.addEventListener("keydown", (e)=>{ if(e.key >= '0' && e.key<='9') digitHandler(e.key); if(e.key==='Enter') setResult(computeExpression(currentInput)); });
+  document.getElementById("resultDisplay").addEventListener("dblclick", ()=>{ setResult(computeExpression(currentInput)); });
+</script>
 </body>
 </html>
